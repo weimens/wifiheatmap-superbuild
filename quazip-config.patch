@@ -1,0 +1,59 @@
+diff --git CMakeLists.txt.orig CMakeLists.txt
+index 6fcdd95..0ed25e1 100644
+--- CMakeLists.txt.orig
++++ CMakeLists.txt
+@@ -61,3 +61,4 @@ set(QUAZIP_LIB_TARGET_NAME quazip${QUAZIP_LIB_VERSION_SUFFIX} CACHE
+ add_subdirectory(quazip)
+ 
+ install(FILES FindQuaZip.cmake RENAME FindQuaZip${QUAZIP_LIB_VERSION_SUFFIX}.cmake DESTINATION share/cmake/Modules)
++install(FILES QuaZipConfig.cmake RENAME QuaZip${QUAZIP_LIB_VERSION_SUFFIX}Config.cmake DESTINATION lib/cmake/QuaZip${QUAZIP_LIB_VERSION_SUFFIX})
+diff --git QuaZipConfig.cmake.orig QuaZipConfig.cmake
+new file mode 100644
+index 0000000..f3cbc89
+--- /dev/null
++++ QuaZipConfig.cmake
+@@ -0,0 +1,44 @@
++set(QUAZIP_CONFIG_DIR ${CMAKE_CURRENT_LIST_DIR}/../../..)
++
++set(QUAZIP_VERSION_MAJOR 0)
++set(QUAZIP_VERSION_MINOR 8)
++set(CGAL_BUGFIX_VERSION 1)
++set(QUAZIP_VERSION "${QUAZIP_VERSION_MAJOR}.${QUAZIP_VERSION_MINOR}.${CGAL_BUGFIX_VERSION}")
++
++IF (Qt5Core_FOUND)
++    set(QUAZIP_LIB_VERSION_SUFFIX 5)
++ENDIF()
++
++FIND_PACKAGE(PkgConfig)
++pkg_check_modules(PC_QUAZIP QUIET quazip)
++set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY BOTH)
++FIND_LIBRARY(QUAZIP_LIBRARIES
++       WIN32_DEBUG_POSTFIX d
++#    NAMES quazip${QUAZIP_LIB_VERSION_SUFFIX}_x86 quazip${QUAZIP_LIB_VERSION_SUFFIX}_armeabi-v7a quazip${QUAZIP_LIB_VERSION_SUFFIX}
++    NAMES
++        quazip${QUAZIP_LIB_VERSION_SUFFIX}_x86
++        quazip${QUAZIP_LIB_VERSION_SUFFIX}_x86_64
++        quazip${QUAZIP_LIB_VERSION_SUFFIX}_armeabi-v7a
++        quazip${QUAZIP_LIB_VERSION_SUFFIX}_arm64-v8
++        quazip${QUAZIP_LIB_VERSION_SUFFIX}
++        quazip${QUAZIP_LIB_VERSION_SUFFIX}d_x86
++        quazip${QUAZIP_LIB_VERSION_SUFFIX}d_x86_64
++        quazip${QUAZIP_LIB_VERSION_SUFFIX}d_armeabi-v7a
++        quazip${QUAZIP_LIB_VERSION_SUFFIX}d_arm64-v8
++        quazip${QUAZIP_LIB_VERSION_SUFFIX}d
++       HINTS ${QUAZIP_CONFIG_DIR}/lib
++)
++
++#find_path(
++#    QUAZIP_INCLUDE_DIR
++#    NAMES "quazip.h"
++#      PATHS "${QUAZIP_CONFIG_DIR}/include"
++#    PATH_SUFFIXES "quazip${QUAZIP_LIB_VERSION_SUFFIX}"
++#)
++set(QUAZIP_INCLUDE_DIR "${QUAZIP_CONFIG_DIR}/include")
++FIND_PATH(QUAZIP_ZLIB_INCLUDE_DIR zlib.h HINTS /usr/include /usr/local/include)
++
++INCLUDE(FindPackageHandleStandardArgs)
++SET(QUAZIP_INCLUDE_DIRS ${QUAZIP_INCLUDE_DIR} ${QUAZIP_ZLIB_INCLUDE_DIR})
++find_package_handle_standard_args(QUAZIP DEFAULT_MSG  QUAZIP_LIBRARIES QUAZIP_INCLUDE_DIR QUAZIP_ZLIB_INCLUDE_DIR QUAZIP_INCLUDE_DIRS)
++
